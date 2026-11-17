@@ -1,0 +1,12 @@
+{
+  "name": "snackio-web",
+  "private": true,
+  "description": "Web Snackio Solutions s.r.o. (snackiosolutions.cz)",
+  "scripts": {
+    "build": "esbuild src/stage.js --bundle --format=esm --minify --target=es2020 --legal-comments=none --outfile=public/assets/js/stage.min.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0",
+    "three": "0.187.0"
+  }
+}
