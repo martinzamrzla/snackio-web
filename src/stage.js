@@ -790,8 +790,8 @@ export function initStage(canvas, options = {}) {
 
     parX = lerp(parX, pointerX, 1 - Math.exp(-dt * 3));
     parY = lerp(parY, pointerY, 1 - Math.exp(-dt * 3));
-    const sway = still ? 0 : Math.sin(time * 0.35) * 0.05;
-    camera.position.set(vPos.x + parX * 0.32 + sway, vPos.y - parY * 0.14, vPos.z);
+    const sway = still ? 0 : Math.sin(time * 0.35) * 0.03;
+    camera.position.set(vPos.x + parX * 0.09 + sway, vPos.y - parY * 0.05, vPos.z);
     camera.lookAt(vLook);
 
     if (!dragging) {
@@ -801,13 +801,13 @@ export function initStage(canvas, options = {}) {
       if (idleTime > 2.2) dragYaw = lerp(dragYaw, 0, 1 - Math.exp(-dt * 1.1));
     }
     dragYaw = clamp(dragYaw, -1.25, 1.25);
-    machine.rotation.y = lerp(a.yaw, b.yaw, k) + dragYaw + parX * 0.06;
+    machine.rotation.y = lerp(a.yaw, b.yaw, k) + dragYaw + parX * 0.025;
   }
 
   // ---------- ovládání ukazatelem ----------
   const raycaster = new THREE.Raycaster();
   const ndc = new THREE.Vector2();
-  let hovered = null, downX = 0, downY = 0, moved = false, pointerInside = false, needPick = false;
+  let hovered = null, downX = 0, downY = 0, moved = false, pointerInside = false, hoverCapable = false;
 
   function setNdc(ev) {
     const rect = canvas.getBoundingClientRect();
@@ -831,6 +831,7 @@ export function initStage(canvas, options = {}) {
 
   canvas.addEventListener('pointermove', (ev) => {
     pointerInside = true;
+    hoverCapable = ev.pointerType === 'mouse';
     setNdc(ev);
     if (dragging) {
       const dx = ev.clientX - lastDragX;
@@ -839,8 +840,6 @@ export function initStage(canvas, options = {}) {
       dragYaw += dx * 0.006;
       dragVel = dx * 0.35;
       idleTime = 0;
-    } else {
-      needPick = true;
     }
   });
   canvas.addEventListener('pointerdown', (ev) => {
@@ -900,7 +899,7 @@ export function initStage(canvas, options = {}) {
 
     updateCamera(dt, time);
 
-    if (needPick && pointerInside && !dragging) { setHover(pick()); needPick = false; }
+    if (pointerInside && !dragging && hoverCapable) setHover(pick());
     slots.forEach((s) => {
       if (!s.front || s.busy) return;
       const target = s === hovered ? 1 : 0;
